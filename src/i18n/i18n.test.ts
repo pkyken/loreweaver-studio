@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest"
 import { detectLanguage } from "./index"
 import en from "./locales/en.json"
+import ja from "./locales/ja.json"
 import zh from "./locales/zh.json"
 
-/** Every studio source file, as text. Vite resolves this at transform time, so
- * the test needs no filesystem access of its own. */
 const STUDIO_SOURCES: Record<string, string> = import.meta.glob("../features/studio/**/*.{ts,tsx}", {
   query: "?raw",
   import: "default",
@@ -19,15 +18,21 @@ function keyPaths(value: unknown, prefix = ""): string[] {
 describe("detectLanguage", () => {
   it("prefers a stored locale over the navigator", () => {
     expect(detectLanguage("zh", "en-US")).toBe("zh")
-    expect(detectLanguage("en", "zh-CN")).toBe("en")
+    expect(detectLanguage("ja", "en-US")).toBe("ja")
+    expect(detectLanguage("en", "ja-JP")).toBe("en")
   })
 
-  it("treats a missing or non-string navigator.language as English", () => {
+  it("treats a missing navigator language as English", () => {
     expect(detectLanguage(null, undefined)).toBe("en")
     expect(detectLanguage(null, null)).toBe("en")
   })
 
-  it("maps a zh* navigator language to zh", () => {
+  it("maps Japanese navigator locales to ja", () => {
+    expect(detectLanguage(null, "ja-JP")).toBe("ja")
+    expect(detectLanguage(null, "ja")).toBe("ja")
+  })
+
+  it("maps Chinese navigator locales to zh", () => {
     expect(detectLanguage(null, "zh-CN")).toBe("zh")
     expect(detectLanguage(null, "zh")).toBe("zh")
   })
@@ -38,25 +43,19 @@ describe("locale resources", () => {
     expect(keyPaths(zh).sort()).toEqual(keyPaths(en).sort())
   })
 
+  it("Japanese translations only use keys defined by English", () => {
+    const englishKeys = new Set(keyPaths(en))
+    expect(keyPaths(ja).filter((key) => !englishKeys.has(key)).sort()).toEqual([])
+  })
+
   it("no locale value is empty", () => {
-    for (const locale of [en, zh]) {
-      const leaves = keyPaths(locale)
-      expect(leaves.length).toBeGreaterThan(0)
-      const flat = JSON.stringify(locale)
-      expect(flat).not.toContain('""')
+    for (const locale of [en, ja, zh]) {
+      expect(keyPaths(locale).length).toBeGreaterThan(0)
+      expect(JSON.stringify(locale)).not.toContain('""')
     }
   })
 
   it("every Issue key a reader can emit has a message under studio.pack.err", () => {
-    // Issue keys are looked up dynamically (`t(\`studio.pack.err.${issue.key}\`)`),
-    // so the i18n lint — which reads literals at their call sites — cannot see
-    // them, and a missing one renders as its own raw key in the panel. That is
-    // how `rulepackInitiativeString` shipped with no message at all. This walks
-    // the readers instead: every `{ key: "…" }` an Issue is built from must
-    // resolve.
-    // Every namespace a `{ key }` literal is rendered from: the forge renders
-    // `studio.err.*`, the pack bench `studio.pack.err.*` (a reader shared by the two
-    // may land in either), and the panels editor its own `studio.panels.problem.*`.
     const messages = new Set([
       ...Object.keys(en.studio.err),
       ...Object.keys(en.studio.pack.err),
@@ -65,9 +64,6 @@ describe("locale resources", () => {
     const emitted = new Set<string>()
     for (const [path, text] of Object.entries(STUDIO_SOURCES)) {
       if (/\.test\.tsx?$/.test(path)) continue
-      // An Issue literal is `{ key }` or `{ key, params }` and nothing else —
-      // that shape is what separates it from the many `{ key, label, … }`
-      // descriptors elsewhere in the tree.
       for (const match of text.matchAll(/\{\s*key:\s*"([A-Za-z0-9_]+)"\s*(?:\}|,\s*params:)/g)) {
         emitted.add(match[1])
       }
