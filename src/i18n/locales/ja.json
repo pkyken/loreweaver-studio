@@ -1,0 +1,302 @@
+{
+  "app": {
+    "title": "Loreweaver Studio"
+  },
+  "nav": {
+    "label": "モード",
+    "play": "プレイ",
+    "studio": "スタジオ"
+  },
+  "lang": {
+    "label": "言語"
+  },
+  "connect": {
+    "title": "卓に参加",
+    "ticket": "サーバーチケット",
+    "ticketPlaceholder": "エンドポイント…",
+    "key": "アクセスキー",
+    "keyPlaceholder": "KPから発行されたキー",
+    "name": "表示名（任意）",
+    "namePlaceholder": "参考値 — キーストア側の名前が優先されます",
+    "submit": "接続",
+    "disconnect": "切断",
+    "protocolMismatch": "プロトコル {{server}} ≠ {{client}}: メジャーバージョンが互換性の基準のため、接続を拒否しました。古い側を更新してください。",
+    "welcomeUnreadable": "サーバーからのwelcomeフレームを読み取れなかったため、接続を拒否しました。両端でフレーム形式が一致していない可能性があります。双方のビルドを確認してください。",
+    "hostLocal": {
+      "button": "ローカルでホストしてプレイ",
+      "starting": "サーバーを起動しています…",
+      "hint": "1回押すだけで、設定済みのEngine checkoutを使うか、対応するprebuilt serverを取得して起動し、KPとしてログインします。",
+      "desktopOnly": "ローカルホストはデスクトップアプリでのみ利用できます。",
+      "cancel": "キャンセル",
+      "home": "サーバーフォルダー（データ・キー・キャッシュ）",
+      "homePlaceholder": "~/.loreweaver"
+    },
+    "attempt": "試行 {{n}}",
+    "status": {
+      "offline": "オフライン",
+      "connecting": "接続中…",
+      "online": "オンライン",
+      "reconnecting": "再接続中…"
+    },
+    "role": {
+      "player": "プレイヤー",
+      "keeper": "KP"
+    },
+    "versions": "server {{server}} · studio {{client}}",
+    "versionUnknown": "（未報告）",
+    "protocolMatch": "両端ともプロトコル {{protocol}} を使用しています。",
+    "protocolDrift": "サーバーはプロトコル {{server}}、Studioは {{client}} を使用しています。同一メジャーバージョンのため接続は可能ですが、片方だけが知るフレームが存在する可能性があります。"
+  },
+  "session": {
+    "empty": "記録はまだ空です。何か話して始めましょう。",
+    "inputPlaceholder": "発言、行動、またはコマンドを入力…",
+    "send": "送信",
+    "echoPending": "送信中…",
+    "echoFailed": "未送信",
+    "serverRefused": "サーバーに拒否されました: {{message}}",
+    "turnBusy": "{{actor}} の行動を処理中…",
+    "turnActivity": {
+      "reading": "シナリオを確認中",
+      "dice": "ダイス判定中",
+      "cast": "登場人物を演じています",
+      "bookkeeping": "状態を整理中"
+    },
+    "turnRound": "· ラウンド {{n}}",
+    "character": "キャラクター",
+    "party": "パーティー",
+    "scene": "シーン",
+    "clock": "時間",
+    "round": "ラウンド {{n}}",
+    "initiative": "イニシアチブ",
+    "trackers": "トラッカー",
+    "presence": "卓の参加者",
+    "online": "{{n}}人オンライン",
+    "context": "コンテキスト",
+    "hiddenVar": "まだプレイヤーには公開されていません（KP表示）。`.var expose <prefix>` でパーティーパネルに公開できます。",
+    "pregens": "作成済みキャラクター",
+    "pregenClaim": "使用する",
+    "pregenClaimed": "{{name}} が使用中",
+    "pregenYours": "自分",
+    "packImport": "パックからインポート",
+    "packImportBrowse": "参照",
+    "packImportClose": "閉じる",
+    "packImportLoading": "カード一覧を取得中…",
+    "packImportTimeout": "サーバーから応答がありません。プロトコル2.2以前の可能性があります。",
+    "packImportRetry": "再試行",
+    "packImportEmpty": "キャラクターカードを含むインストール済みパックはありません。",
+    "packImportAction": "インポート",
+    "packImportWorld": "ワールドカード",
+    "packImportKeeperOnly": "モジュール用データです。KPがインポートします。",
+    "varEdit": "編集",
+    "varEditDone": "完了",
+    "varEditHint": "通常の `.var set` / `.var add` コマンド経由で変更されるため、Engineが変数定義の範囲・選択肢などを検証し、変更は卓へ即時反映されます。",
+    "varIncrement": "{{label}} を増やす",
+    "varDecrement": "{{label}} を減らす",
+    "varToggle": "切り替え",
+    "varSet": "{{label}} を設定",
+    "varSetAction": "設定"
+  },
+  "panels": {
+    "menu": "パネル（{{n}}）",
+    "menuAria": "モジュールパネルメニュー",
+    "notice": "この部屋ではモジュール独自UIを使用します — {{n}}パネル、{{mb}} MB。",
+    "noticeOk": "了解",
+    "blocksOnly": "ブロックのみ表示",
+    "blocksOnlyHint": "Tier-2パネルのコードを実行せず、すべて通常ブロックとして表示します",
+    "richOnly": "このパネルはリッチクライアントで利用できます。",
+    "loading": "パネルを読み込み中…",
+    "stalled": "このパネルは開始できませんでした。代替表示を使用します。",
+    "crashDetail": "パネルからの報告: {{message}}",
+    "assetError": "パネル用アセットの読み込みに失敗しました。",
+    "imageLoading": "画像を読み込み中…",
+    "imageUnavailable": "画像を利用できません",
+    "retry": "再試行",
+    "collapse": "パネルを折りたたむ",
+    "expand": "パネルを展開",
+    "close": "閉じる",
+    "open": "開く",
+    "reopen": "再度開く",
+    "slot": {
+      "sidebar": "サイドバー",
+      "tray": "トレイ",
+      "modal": "オーバーレイ"
+    }
+  },
+  "log": {
+    "system": "システム"
+  },
+  "play": {
+    "back": "← メニュー",
+    "busy": "処理中…",
+    "sendFailed": "送信できませんでした。部屋へ接続できているか確認して、もう一度試してください。",
+    "menuButton": "メニュー",
+    "menu": {
+      "label": "メインメニュー",
+      "table": "卓「{{room}}」",
+      "role": {
+        "keeper": "KP",
+        "player": "探索者"
+      },
+      "enterGame": "ゲームに入る",
+      "demo": "サンプルシナリオをプレイ",
+      "demoAction": "内蔵サンプルシナリオを開始",
+      "character": "自分のキャラクター",
+      "settings": "設定",
+      "keeperSection": "── KP ──",
+      "keys": "部屋と招待",
+      "module": "モジュールをインポート",
+      "rules": "ルールシステム",
+      "skills": "KPスキル",
+      "model": "モデル / 設定",
+      "quit": "切断"
+    },
+    "keys": {
+      "name": "名前",
+      "room": "部屋",
+      "role": "役割",
+      "key": "キー",
+      "mint": "招待を発行",
+      "mintedOnce": "{{name}} 用の招待です。表示は1回だけなので今コピーしてください:",
+      "copy": "コピー",
+      "copied": "コピーしました ✓",
+      "delete": "削除",
+      "empty": "キーはまだありません。上から招待を発行してください。"
+    },
+    "model": {
+      "provider": "プロバイダー",
+      "ready": "●",
+      "chatModel": "チャットモデル",
+      "listModels": "モデル一覧を取得",
+      "baseUrl": "Base URL（任意）",
+      "apiKey": "APIキー（書き込み専用）",
+      "keyMasked": "保存済み: {{masked}}",
+      "apply": "適用",
+      "demoActive": "オフラインのサンプルKPが動作中です。モデルを適用するとこの部屋はAIモデルへ切り替わります。"
+    },
+    "module": {
+      "path": "サーバー上のモジュールパス",
+      "pathPlaceholder": "packs/blackpool.lwpack またはソースディレクトリ",
+      "install": "インストール（.module）",
+      "sent": "送信しました。結果はゲームログのシステム行に表示されます。",
+      "describe": "またはForgeに作らせるモジュールを説明",
+      "describePlaceholder": "霧に包まれた灯台を舞台にした一夜完結のCoCシナリオ…",
+      "generate": "生成してインストール",
+      "generateOk": "{{name}} — {{detail}}",
+      "generateError": "生成に失敗しました: {{error}}"
+    },
+    "pack": {
+      "title": "コミュニティパックをインストール",
+      "ref": "パック参照",
+      "refPlaceholder": "gh:owner/repo@v1.0.0、https://リンク、またはサーバーパス",
+      "install": "インストール（.pack install）",
+      "hint": "サーバーがインストールしてこの部屋で有効化します。プレイ前にゲームログへ表示される注意事項を確認してください。",
+      "sent": "送信しました。結果はゲームログのシステム行に表示されます。"
+    },
+    "rules": {
+      "builtIn": "内蔵",
+      "empty": "ルールシステムが報告されていません。"
+    },
+    "skills": {
+      "empty": "インストール済みのKPスキルはありません。"
+    },
+    "character": {
+      "none": "キャラクターがまだありません。下で作成するか、モジュールの作成済みキャラクターを使用してください。",
+      "noSystems": "サーバーからルールシステムが報告されていません。プロトコル2.3以前の可能性があります。",
+      "createMode": "作成方法",
+      "mode": {
+        "roll": "ダイスで作成",
+        "roll.hint": "サーバーがこのシステムの能力値をロールし、派生値を計算します。",
+        "describe": "説明から作成",
+        "describe.hint": "人物像を文章で入力すると、KPモデルがシート案を作り、ルール側で検証します。",
+        "import": "カードをインポート",
+        "import.hint": "サーバー上のSillyTavernキャラクターカードを使います。ワールド用データは取り除かれます。"
+      },
+      "system": "ルールシステム",
+      "name": "名前",
+      "namePlaceholder": "空欄ならサーバーに命名させます",
+      "description": "どんな人物ですか？",
+      "descriptionPlaceholder": "潮汐表を趣味で読む港の事務員。人と目を合わせない。",
+      "cardPath": "カードファイル",
+      "cardPathPlaceholder": "例: harbour/cards/pilot.png。Party → Import from pack から参照できます。サーバーパス指定はKP専用です。",
+      "create": "キャラクターを作成",
+      "sent": "送信: {{command}}",
+      "editHint": "値をクリックして変更できます。サーバーがルールシステムに従って検証します。",
+      "finalize": "派生値を再計算",
+      "finalizeHint": "現在HP / MP / SANを、現在の能力値から算出される最大値へ戻します。",
+      "delete": "キャラクターを削除",
+      "deleteConfirm": "完全に削除",
+      "deleteCancel": "残す"
+    },
+    "settings": {
+      "themeHint": "卓の配色です。TUIのF1〜F5と同じ並びです。LamplightがLoreweaver標準テーマです。",
+      "themes": {
+        "lamplight": "Lamplight",
+        "amber": "Amber",
+        "df16": "DF-16",
+        "phosphor": "Phosphor",
+        "paperwhite": "Paperwhite"
+      }
+    },
+    "dice": {
+      "versus": "対",
+      "tie": "引き分け",
+      "winner": "{{name}} の勝ち",
+      "detail": {
+        "bonus": "ボーナスダイス",
+        "penalty": "ペナルティダイス",
+        "modifier": "修正値",
+        "proficient": "習熟",
+        "advantage": "有利",
+        "disadvantage": "不利",
+        "loss": "減少",
+        "loss_expr": "減少ロール",
+        "loss_ceiling": "減少上限",
+        "remaining": "残り",
+        "resource_max": "最大",
+        "points": "消費",
+        "raw_roll": "出目",
+        "critical_success": "クリティカル",
+        "critical_failure": "ファンブル",
+        "mark": "マーク済み",
+        "stat_delta": "変化"
+      }
+    },
+    "media": {
+      "title": "共有画像",
+      "share": "画像を共有…",
+      "empty": "この部屋ではまだ画像が共有されていません。",
+      "allowUploads": "プレイヤーのアップロードを許可",
+      "uploadsOff": "KPがこの部屋でプレイヤーのアップロードを無効にしています。",
+      "useAsAvatar": "アバターに設定",
+      "dismiss": "閉じる",
+      "uploadFailed": "{{name}} を共有できませんでした: {{detail}}"
+    },
+    "audio": {
+      "title": "サウンド",
+      "layers": {
+        "bgm": "BGM",
+        "ambience": "環境音",
+        "sfx": "効果音"
+      },
+      "silent": "—",
+      "untitled": "（無題）",
+      "mute": "ミュート",
+      "muteAll": "すべてミュート",
+      "muteLayer": "{{layer}}をミュート",
+      "gainLayer": "{{layer}}の音量",
+      "unlock": "サウンドを有効化",
+      "unlockHint": "このウィンドウは操作されるまで音声再生をブロックするため、KPのキューは失われず待機します。",
+      "keeperLayer": "レイヤー",
+      "keeperTrack": "トラック",
+      "keeperPick": "（選択）",
+      "keeperLoop": "ループ",
+      "keeperPlay": "再生",
+      "keeperPause": "一時停止",
+      "keeperResume": "再開",
+      "keeperStop": "停止",
+      "keeperVolume": "配信音量",
+      "keeperImport": "パックの音声をインポート",
+      "keeperImportRun": "インポート"
+    }
+  }
+}
