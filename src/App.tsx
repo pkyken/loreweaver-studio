@@ -47,6 +47,8 @@ export default function App() {
         >
           <option value="en">English</option>
           {/* i18n-exempt: a language is offered in its OWN name, never translated. */}
+          <option value="ja">日本語</option>
+          {/* i18n-exempt: a language is offered in its OWN name, never translated. */}
           <option value="zh">中文</option>
         </select>
       </header>
