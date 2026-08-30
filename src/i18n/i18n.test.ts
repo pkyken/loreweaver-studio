@@ -47,7 +47,11 @@ describe("locale resources", () => {
 
   it("Japanese translations only use keys defined by English", () => {
     const englishKeys = new Set(keyPaths(en))
-    expect(keyPaths(ja).filter((key) => !englishKeys.has(key)).sort()).toEqual([])
+    expect(
+      keyPaths(ja)
+        .filter((key) => !englishKeys.has(key))
+        .sort(),
+    ).toEqual([])
   })
 
   it("no locale value is empty", () => {
