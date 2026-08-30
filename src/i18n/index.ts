@@ -1,12 +1,16 @@
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 import en from "./locales/en.json"
+import ja from "./locales/ja.json"
 import zh from "./locales/zh.json"
 
 const STORAGE_KEY = "lw-lang"
 
+type SupportedLanguage = "en" | "ja" | "zh"
+
 export const resources = {
   en: { translation: en },
+  ja: { translation: ja },
   zh: { translation: zh },
 } as const
 
@@ -15,10 +19,12 @@ export const resources = {
 export function detectLanguage(
   stored: string | null | undefined,
   navigatorLanguage: string | null | undefined,
-): "en" | "zh" {
-  if (stored === "en" || stored === "zh") return stored
+): SupportedLanguage {
+  if (stored === "en" || stored === "ja" || stored === "zh") return stored
   const nav = typeof navigatorLanguage === "string" ? navigatorLanguage.toLowerCase() : ""
-  return nav.startsWith("zh") ? "zh" : "en"
+  if (nav.startsWith("ja")) return "ja"
+  if (nav.startsWith("zh")) return "zh"
+  return "en"
 }
 
 function initialLanguage(): string {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { detectLanguage } from "./index"
 import en from "./locales/en.json"
+import ja from "./locales/ja.json"
 import zh from "./locales/zh.json"
 
 /** Every studio source file, as text. Vite resolves this at transform time, so
@@ -19,7 +20,8 @@ function keyPaths(value: unknown, prefix = ""): string[] {
 describe("detectLanguage", () => {
   it("prefers a stored locale over the navigator", () => {
     expect(detectLanguage("zh", "en-US")).toBe("zh")
-    expect(detectLanguage("en", "zh-CN")).toBe("en")
+    expect(detectLanguage("ja", "en-US")).toBe("ja")
+    expect(detectLanguage("en", "ja-JP")).toBe("en")
   })
 
   it("treats a missing or non-string navigator.language as English", () => {
@@ -27,7 +29,12 @@ describe("detectLanguage", () => {
     expect(detectLanguage(null, null)).toBe("en")
   })
 
-  it("maps a zh* navigator language to zh", () => {
+  it("maps a ja* navigator language to Japanese", () => {
+    expect(detectLanguage(null, "ja-JP")).toBe("ja")
+    expect(detectLanguage(null, "ja")).toBe("ja")
+  })
+
+  it("maps a zh* navigator language to Chinese", () => {
     expect(detectLanguage(null, "zh-CN")).toBe("zh")
     expect(detectLanguage(null, "zh")).toBe("zh")
   })
@@ -38,8 +45,13 @@ describe("locale resources", () => {
     expect(keyPaths(zh).sort()).toEqual(keyPaths(en).sort())
   })
 
+  it("Japanese translations only use keys defined by English", () => {
+    const englishKeys = new Set(keyPaths(en))
+    expect(keyPaths(ja).filter((key) => !englishKeys.has(key)).sort()).toEqual([])
+  })
+
   it("no locale value is empty", () => {
-    for (const locale of [en, zh]) {
+    for (const locale of [en, ja, zh]) {
       const leaves = keyPaths(locale)
       expect(leaves.length).toBeGreaterThan(0)
       const flat = JSON.stringify(locale)
