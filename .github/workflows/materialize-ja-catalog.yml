@@ -1,0 +1,65 @@
+name: Materialize Japanese catalog
+
+on:
+  push:
+    branches:
+      - i18n/japanese-complete
+    paths:
+      - .github/workflows/materialize-ja-catalog.yml
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    name: Apply staged Japanese catalog patches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply staged translation patches
+        run: |
+          python scripts/_apply_ja_catalog_ai_split.py
+          python scripts/_apply_ja_catalog_wizard.py
+      - name: Audit generated key coverage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("src/i18n/locales")
+          en = json.loads((root / "en.json").read_text(encoding="utf-8"))
+          ja = json.loads((root / "ja.json").read_text(encoding="utf-8"))
+
+          def leaves(value, prefix=""):
+              if not isinstance(value, dict):
+                  return {prefix}
+              result = set()
+              for key, child in value.items():
+                  path = f"{prefix}.{key}" if prefix else key
+                  result.update(leaves(child, path))
+              return result
+
+          en_keys = leaves(en)
+          ja_keys = leaves(ja)
+          report = {
+              "english_keys": len(en_keys),
+              "japanese_keys": len(ja_keys),
+              "missing_count": len(en_keys - ja_keys),
+              "extra_count": len(ja_keys - en_keys),
+              "missing": sorted(en_keys - ja_keys),
+              "extra": sorted(ja_keys - en_keys),
+          }
+          Path("ja-catalog-report.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(report, ensure_ascii=False))
+          PY
+      - name: Upload generated catalog
+        uses: actions/upload-artifact@v4
+        with:
+          name: materialized-ja-catalog
+          path: |
+            src/i18n/locales/ja.json
+            ja-catalog-report.json
+          retention-days: 1
