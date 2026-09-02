@@ -8,59 +8,128 @@ on:
       - .github/workflows/materialize-ja-catalog.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate:
-    name: Apply staged Japanese catalog patches
+    name: Apply and verify Japanese catalog translations
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: i18n/japanese-complete
+
       - name: Apply staged translation patches
         run: |
           python scripts/_apply_ja_catalog_ai_split.py
           python scripts/_apply_ja_catalog_wizard.py
-      - name: Audit generated key coverage
-        run: |
+          cat scripts/.ja_remaining_patch.part{1,2,3,4,5} > /tmp/ja-patch.b64
           python - <<'PY'
+          import base64
           import json
+          import zlib
           from pathlib import Path
 
           root = Path("src/i18n/locales")
           en = json.loads((root / "en.json").read_text(encoding="utf-8"))
           ja = json.loads((root / "ja.json").read_text(encoding="utf-8"))
+          encoded = Path("/tmp/ja-patch.b64").read_text(encoding="utf-8")
+          patch = json.loads(zlib.decompress(base64.b64decode(encoded)).decode("utf-8"))
+          consumed: set[str] = set()
+
+          def apply(english, japanese, prefix=""):
+              if not isinstance(english, dict):
+                  return japanese
+              result = dict(japanese) if isinstance(japanese, dict) else {}
+              for key, english_value in english.items():
+                  path = f"{prefix}.{key}" if prefix else key
+                  if isinstance(english_value, dict):
+                      result[key] = apply(english_value, result.get(key), path)
+                  elif path in patch:
+                      result[key] = patch[path]
+                      consumed.add(path)
+              return result
+
+          ja = apply(en, ja)
+          unused = sorted(set(patch) - consumed)
+          if unused:
+              raise SystemExit("Unused Japanese patch paths:\n" + "\n".join(unused))
+          (root / "ja.json").write_text(
+              json.dumps(ja, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Audit complete Japanese catalog
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          root = Path("src/i18n/locales")
+          en = json.loads((root / "en.json").read_text(encoding="utf-8"))
+          ja = json.loads((root / "ja.json").read_text(encoding="utf-8"))
+          placeholder_re = re.compile(r"{{\s*([^{}]+?)\s*}}")
 
           def leaves(value, prefix=""):
               if not isinstance(value, dict):
-                  return {prefix}
-              result = set()
+                  return {prefix: value}
+              result = {}
               for key, child in value.items():
                   path = f"{prefix}.{key}" if prefix else key
                   result.update(leaves(child, path))
               return result
 
-          en_keys = leaves(en)
-          ja_keys = leaves(ja)
+          en_values = leaves(en)
+          ja_values = leaves(ja)
+          missing = sorted(set(en_values) - set(ja_values))
+          extra = sorted(set(ja_values) - set(en_values))
+          empty = sorted(
+              key for key, value in ja_values.items()
+              if not isinstance(value, str) or not value.strip()
+          )
+          placeholder_mismatches = sorted(
+              key for key in en_values.keys() & ja_values.keys()
+              if sorted(placeholder_re.findall(en_values[key]))
+              != sorted(placeholder_re.findall(ja_values[key]))
+          )
           report = {
-              "english_keys": len(en_keys),
-              "japanese_keys": len(ja_keys),
-              "missing_count": len(en_keys - ja_keys),
-              "extra_count": len(ja_keys - en_keys),
-              "missing": sorted(en_keys - ja_keys),
-              "extra": sorted(ja_keys - en_keys),
+              "english_keys": len(en_values),
+              "japanese_keys": len(ja_values),
+              "missing_count": len(missing),
+              "extra_count": len(extra),
+              "empty_count": len(empty),
+              "placeholder_mismatch_count": len(placeholder_mismatches),
+              "missing": missing,
+              "extra": extra,
+              "empty": empty,
+              "placeholder_mismatches": placeholder_mismatches,
           }
           Path("ja-catalog-report.json").write_text(
               json.dumps(report, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8",
           )
           print(json.dumps(report, ensure_ascii=False))
+          if missing or extra or empty or placeholder_mismatches:
+              raise SystemExit("Japanese catalog verification failed")
           PY
-      - name: Upload generated catalog and English reference
+
+      - name: Commit materialized catalog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/i18n/locales/ja.json
+          if git diff --cached --quiet; then
+            echo "Japanese catalog is already materialized."
+          else
+            git commit -m "i18n: complete Japanese Studio catalog"
+            git push origin HEAD:i18n/japanese-complete
+          fi
+
+      - name: Upload verification report
         uses: actions/upload-artifact@v4
         with:
-          name: materialized-ja-catalog
-          path: |
-            src/i18n/locales/en.json
-            src/i18n/locales/ja.json
-            ja-catalog-report.json
+          name: japanese-catalog-verification
+          path: ja-catalog-report.json
           retention-days: 1
