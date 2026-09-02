@@ -55,11 +55,12 @@ jobs:
           )
           print(json.dumps(report, ensure_ascii=False))
           PY
-      - name: Upload generated catalog
+      - name: Upload generated catalog and English reference
         uses: actions/upload-artifact@v4
         with:
           name: materialized-ja-catalog
           path: |
+            src/i18n/locales/en.json
             src/i18n/locales/ja.json
             ja-catalog-report.json
           retention-days: 1
