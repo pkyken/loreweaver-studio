@@ -17,6 +17,19 @@ function keyPaths(value: unknown, prefix = ""): string[] {
   return Object.entries(value).flatMap(([key, child]) => keyPaths(child, prefix ? `${prefix}.${key}` : key))
 }
 
+function leafValues(value: unknown, prefix = ""): Record<string, string> {
+  if (typeof value === "string") return { [prefix]: value }
+  if (typeof value !== "object" || value === null) return {}
+  return Object.entries(value).reduce<Record<string, string>>((result, [key, child]) => {
+    Object.assign(result, leafValues(child, prefix ? `${prefix}.${key}` : key))
+    return result
+  }, {})
+}
+
+function placeholders(value: string): string[] {
+  return [...value.matchAll(/{{\s*([^{}]+?)\s*}}/g)].map((match) => match[1].trim()).sort()
+}
+
 describe("detectLanguage", () => {
   it("prefers a stored locale over the navigator", () => {
     expect(detectLanguage("zh", "en-US")).toBe("zh")
@@ -45,13 +58,8 @@ describe("locale resources", () => {
     expect(keyPaths(zh).sort()).toEqual(keyPaths(en).sort())
   })
 
-  it("Japanese translations only use keys defined by English", () => {
-    const englishKeys = new Set(keyPaths(en))
-    expect(
-      keyPaths(ja)
-        .filter((key) => !englishKeys.has(key))
-        .sort(),
-    ).toEqual([])
+  it("en and ja declare exactly the same key set", () => {
+    expect(keyPaths(ja).sort()).toEqual(keyPaths(en).sort())
   })
 
   it("no locale value is empty", () => {
@@ -60,6 +68,14 @@ describe("locale resources", () => {
       expect(leaves.length).toBeGreaterThan(0)
       const flat = JSON.stringify(locale)
       expect(flat).not.toContain('""')
+    }
+  })
+
+  it("Japanese interpolation placeholders match English", () => {
+    const english = leafValues(en)
+    const japanese = leafValues(ja)
+    for (const key of Object.keys(english)) {
+      expect(placeholders(japanese[key]), key).toEqual(placeholders(english[key]))
     }
   })
 
