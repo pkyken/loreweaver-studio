@@ -1,0 +1,37 @@
+name: Verify Japanese Studio and Engine integration
+
+on:
+  push:
+    branches:
+      - i18n/japanese-complete
+    paths:
+      - .github/workflows/verify-ja-integration.yml
+
+permissions:
+  contents: read
+
+jobs:
+  roundtrip:
+    name: Japanese branches cross-repo round-trip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: i18n/japanese-complete
+      - name: Clone Japanese Engine branch
+        run: git clone --depth 1 --branch feature/japanese-localization https://github.com/pkyken/loreweaver.git ../trpg_kp
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - name: Sync Engine dependencies
+        run: uv sync --extra ejs
+        working-directory: ../trpg_kp
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run Studio ↔ Engine round-trip gate
+        run: bash scripts/check_roundtrip.sh
+        env:
+          TRPG_KP_REPO: ../trpg_kp
