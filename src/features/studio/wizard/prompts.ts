@@ -6,6 +6,7 @@
 
 import type { ManualSlot, StageDraft, StageId, WorldPath } from "./stages"
 
+// i18n-exempt: fixed AI prompt data; the embedded examples intentionally cover multiple languages.
 const SHARED_RULES = `
 You are the staged co-creation assistant inside Loreweaver Studio's card wizard.
 The AUTHOR is the creative lead. You STRUCTURE what they wrote — tighten, organize, fill
@@ -87,8 +88,9 @@ descriptions with ranges/options become typed bounds. Track only state the STORY
 one per line, for when and how each variable moves (the engine turns them into hooks later).`,
 }
 
+// i18n-exempt: fixed AI prompt data; this YAML example intentionally contains Japanese content.
 const STAGE_SHOTS: Partial<Record<StageId, string>> = {
-  variables: `Example initvar_yaml (shape only — invent nothing the author didn't imply):
+  variables: /* i18n-exempt: fixed AI prompt data; this YAML example intentionally contains Japanese content. */ `Example initvar_yaml (shape only — invent nothing the author didn't imply):
 理:
   好感度: [0, "对玩家的好感 [0,100]"]
   阶段: [平静, "剧情阶段 可选值: 平静|风暴|清算"]

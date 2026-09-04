@@ -16,11 +16,17 @@ export default function ModelScreen({ onBack }: { onBack: () => void }) {
   const refreshConfig = useAdminStore((s) => s.refreshConfig)
   const listModels = useAdminStore((s) => s.listModels)
   const setModel = useAdminStore((s) => s.setModel)
+  const setImagegen = useAdminStore((s) => s.setImagegen)
 
   const [provider, setProvider] = useState("")
   const [chatModel, setChatModel] = useState("")
   const [baseUrl, setBaseUrl] = useState("")
   const [apiKey, setApiKey] = useState("")
+  const [imageProvider, setImageProvider] = useState("")
+  const [imageModel, setImageModel] = useState("")
+  const [imageBaseUrl, setImageBaseUrl] = useState("")
+  const [imageSize, setImageSize] = useState("1024x1024")
+  const [imageApiKey, setImageApiKey] = useState("")
 
   useEffect(() => {
     refreshConfig()
@@ -34,11 +40,27 @@ export default function ModelScreen({ onBack }: { onBack: () => void }) {
     setChatModel(config.chat_model)
     setBaseUrl(config.base_url)
     setApiKey("")
+    setImageProvider(config.imagegen?.provider ?? "")
+    setImageModel(config.imagegen?.model ?? "")
+    setImageBaseUrl(config.imagegen?.base_url ?? "")
+    setImageSize(config.imagegen?.size ?? "1024x1024")
+    setImageApiKey("")
   }, [config])
 
   const apply = () => {
     if (!provider.trim()) return
     setModel(provider.trim(), chatModel.trim() || undefined, apiKey || undefined, baseUrl.trim())
+  }
+
+  const applyImagegen = () => {
+    if (!imageProvider.trim() || !imageModel.trim()) return
+    setImagegen(
+      imageProvider.trim(),
+      imageModel.trim(),
+      imageProvider.trim().toLowerCase() === "comfyui" ? undefined : imageApiKey || undefined,
+      imageBaseUrl.trim(),
+      imageSize.trim() || undefined,
+    )
   }
 
   const catalog = modelsProvider === provider ? models : []
@@ -94,6 +116,69 @@ export default function ModelScreen({ onBack }: { onBack: () => void }) {
         </label>
         <button type="button" className="primary-button" onClick={apply} disabled={!provider.trim()}>
           {t("play.model.apply")}
+        </button>
+      </div>
+
+      <div className="play-form">
+        <h3 className="play-form-title">{t("play.model.imageGenTitle")}</h3>
+        <p className="studio-hint">{t("play.model.imageGenHint")}</p>
+        {config?.imagegen ? (
+          <p className="studio-hint">
+            {config.imagegen.configured
+              ? t("play.model.imageGenConfigured")
+              : t("play.model.imageGenNotConfigured")}
+          </p>
+        ) : null}
+        <label className="field">
+          {t("play.model.imageGenProvider")}
+          <select value={imageProvider} onChange={(e) => setImageProvider(e.target.value)}>
+            {imageProvider && !["comfyui", "openai", "supergrok", "custom"].includes(imageProvider) ? (
+              <option value={imageProvider}>{imageProvider}</option>
+            ) : null}
+            <option value="">{t("play.model.imageGenProviderPlaceholder")}</option>
+            <option value="comfyui">{t("play.model.imageGenProviderComfyUI")}</option>
+            <option value="openai">{t("play.model.imageGenProviderOpenAI")}</option>
+            <option value="supergrok">{t("play.model.imageGenProviderSuperGrok")}</option>
+            <option value="custom">{t("play.model.imageGenCustomProvider")}</option>
+          </select>
+        </label>
+        <label className="field">
+          {t("play.model.imageGenModel")}
+          <input value={imageModel} onChange={(e) => setImageModel(e.target.value)} spellCheck={false} />
+        </label>
+        <label className="field">
+          {t("play.model.imageGenBaseUrl")}
+          <input
+            value={imageBaseUrl}
+            onChange={(e) => setImageBaseUrl(e.target.value)}
+            placeholder="http://127.0.0.1:8188"
+            spellCheck={false}
+          />
+        </label>
+        <label className="field">
+          {t("play.model.imageGenSize")}
+          <input value={imageSize} onChange={(e) => setImageSize(e.target.value)} spellCheck={false} />
+        </label>
+        {imageProvider.toLowerCase() === "comfyui" ? (
+          <p className="studio-hint">{t("play.model.imageGenComfyHint")}</p>
+        ) : (
+          <label className="field">
+            {t("play.model.imageGenApiKey")}
+            <input
+              type="password"
+              value={imageApiKey}
+              onChange={(e) => setImageApiKey(e.target.value)}
+              placeholder={config?.imagegen ? t("play.model.imageGenKeyMasked", { masked: config.imagegen.api_key_masked }) : ""}
+            />
+          </label>
+        )}
+        <button
+          type="button"
+          className="primary-button"
+          onClick={applyImagegen}
+          disabled={!imageProvider.trim() || !imageModel.trim()}
+        >
+          {t("play.model.imageGenApply")}
         </button>
       </div>
     </ScreenShell>

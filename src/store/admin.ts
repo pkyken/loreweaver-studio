@@ -47,6 +47,7 @@ interface AdminState {
   ingest: (frame: ServerFrame) => boolean
   refreshConfig: () => void
   setModel: (provider: string, chatModel?: string, apiKey?: string, baseUrl?: string) => void
+  setImagegen: (provider: string, model: string, apiKey?: string, baseUrl?: string, size?: string) => void
   listModels: (provider?: string, apiKey?: string, baseUrl?: string) => void
   listKeys: () => void
   mintKey: (room: string, name: string, role: PlayerRole, purpose?: AdminKeyPurpose) => void
@@ -150,6 +151,18 @@ export const useAdminStore = create<AdminState>((set) => ({
         ...(chatModel ? { chat_model: chatModel } : {}),
         ...(apiKey ? { api_key: apiKey } : {}),
         ...(baseUrl !== undefined ? { base_url: baseUrl } : {}),
+      },
+      set,
+    ),
+  setImagegen: (provider, model, apiKey, baseUrl, size) =>
+    send(
+      {
+        type: "admin_set_imagegen",
+        provider,
+        model,
+        ...(apiKey !== undefined ? { api_key: apiKey } : {}),
+        ...(baseUrl !== undefined ? { base_url: baseUrl } : {}),
+        ...(size ? { size } : {}),
       },
       set,
     ),
