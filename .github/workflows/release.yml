@@ -33,7 +33,13 @@ jobs:
           test "$CONF" = "$PKG"
           test "$CONF" = "$CARGO"
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            test "$CONF" = "${GITHUB_REF_NAME#v}"
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            # Keep the short human-facing 0.0.3b tag while using valid SemVer
+            # prerelease syntax in Cargo and Tauri.
+            if [ "$TAG_VERSION" = "0.0.3b" ]; then
+              TAG_VERSION="0.0.3-beta"
+            fi
+            test "$CONF" = "$TAG_VERSION"
           fi
 
   build:
@@ -82,8 +88,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
-          releaseName: "Loreweaver Studio v__VERSION__"
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
+          releaseName: ${{ github.ref_type == 'tag' && format('Loreweaver Studio {0}', github.ref_name) || 'Loreweaver Studio v__VERSION__' }}
           releaseBody: |
             Unsigned builds — the README's install section has the one-step
             macOS Gatekeeper and Windows SmartScreen workarounds. On first

@@ -1,6 +1,6 @@
 {
   "name": "loreweaver-studio",
-  "version": "0.0.3b",
+  "version": "0.0.3-beta",
   "private": true,
   "type": "module",
   "scripts": {
